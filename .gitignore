@@ -6,3 +6,4 @@ build_timestamp_*
 install-templates.sh
 pkgs-for-template/*
 cache_*/
+mnt/

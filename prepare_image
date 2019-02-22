@@ -51,6 +51,7 @@ if [ -f "${IMG}" ]; then
     echo "-> Image file already exists, assuming *update*..."
     if [ "0$TEMPLATE_ROOT_WITH_PARTITIONS" -eq 1 ]; then
         IMG_LOOP=$(/sbin/losetup -P -f --show "$IMG")
+	BOOT_DEV=${IMG_LOOP}p2
         ROOT_DEV=${IMG_LOOP}p3
     else
         IMG_LOOP=$(/sbin/losetup -f --show "$IMG")
@@ -88,8 +89,10 @@ EOF
 fi
 
 mount "${ROOT_DEV}" "${INSTALLDIR}" || exit 1
-mkdir -p "${INSTALLDIR}/boot"
-mount "${BOOT_DEV}" "${INSTALLDIR}/boot" || exit 1
+if [ ! -z "${BOOT_DEV}" ]; then
+    mkdir -p "${INSTALLDIR}/boot"
+    mount "${BOOT_DEV}" "${INSTALLDIR}/boot" || exit 1
+fi
 trap "umount_kill $(readlink -m ${INSTALLDIR})" EXIT
 "${SCRIPTSDIR}/01_install_core.sh"
 
